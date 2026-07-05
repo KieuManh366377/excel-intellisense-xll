@@ -52,7 +52,7 @@ Giới hạn của cơ chế cầu nối này:
 ## 4. Cài đặt
 
 ### Bước 1 - Chuẩn bị thư mục
-Đặt 3 file sau vào **cùng 1 thư mục**:
+Đặt 2 file sau vào **cùng 1 thư mục**:
 ```
 ExcelIntellisense64.XLL
 VBAFunctions.xml
