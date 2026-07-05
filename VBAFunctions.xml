@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Functions>
+  <Function name="Cong">
+    <Description>Tinh tong cua A va B (A + B)</Description>
+    <Param name="A">So thu nhat</Param>
+    <Param name="B">So thu hai</Param>
+  </Function>
+  <Function name="Tru">
+    <Description>Tinh hieu cua A va B (A - B)</Description>
+    <Param name="A">So bi tru</Param>
+    <Param name="B">So tru</Param>
+  </Function>
+  <Function name="Nhan">
+    <Description>Tinh tich cua A va B (A * B)</Description>
+    <Param name="A">So thu nhat</Param>
+    <Param name="B">So thu hai</Param>
+  </Function>
+  <Function name="Chia">
+    <Description>Tinh thuong cua A chia B (A / B), tra ve #DIV/0! neu B = 0</Description>
+    <Param name="A">So bi chia</Param>
+    <Param name="B">So chia</Param>
+  </Function>
+  <Function name="TinhTongCoDieuKien">
+    <Description>Tinh tong cac gia tri trong vung, co the loc theo dieu kien don gian</Description>
+    <Param name="Rng">Vung du lieu (Range) can tinh tong</Param>
+    <Param name="[Condition]">Dieu kien loc dang &gt;100, &lt;50, &gt;=10, &lt;=20, =5, &lt;&gt;0 (bo trong = tinh tong tat ca)</Param>
+  </Function>
+</Functions>
