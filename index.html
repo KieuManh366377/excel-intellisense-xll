@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Excel Intellisense XLL &mdash; Tooltip IntelliSense cho ham VBA</title>
+<meta name="description" content="Add-in Excel (.xll 64-bit) them tooltip goi y tham so cho ham VBA tu viet, tuy chon cau noi goi nhu ham Excel that.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0f0e;
+    --bg-soft:#0e1412;
+    --surface:#131a18;
+    --surface-2:#182120;
+    --border:rgba(233,243,240,0.09);
+    --border-strong:rgba(233,243,240,0.16);
+    --text:#eef3f0;
+    --text-dim:#a2b6af;
+    --text-faint:#5f736c;
+    --ref-blue:#5aa9e6;
+    --ref-green:#4fc38a;
+    --ref-purple:#b58aff;
+    --ref-orange:#f2a65a;
+    --ref-pink:#f2617a;
+    --radius:14px;
+    --font-display:'Be Vietnam Pro', system-ui, sans-serif;
+    --font-mono:'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(90,169,230,0.08), transparent 60%),
+      radial-gradient(ellipse 800px 500px at 100% 0%, rgba(181,138,255,0.06), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--font-display);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* --- language toggling: both vi/en markup exist, one is hidden --- */
+  [data-lang="vi"] .en{display:none;}
+  [data-lang="en"] .vi{display:none;}
+
+  a{color:inherit;}
+  code, .mono{font-family:var(--font-mono);}
+
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+
+  /* --- top bar --- */
+  .topbar{
+    position:sticky;top:0;z-index:40;
+    background:rgba(11,15,14,0.82);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .topbar .wrap{
+    display:flex;align-items:center;justify-content:space-between;
+    height:60px;
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;letter-spacing:0.01em;}
+  .brand .fx{
+    font-family:var(--font-mono);font-weight:700;font-size:13px;
+    color:var(--bg);background:var(--ref-green);
+    padding:3px 7px;border-radius:6px;
+  }
+  .brand small{color:var(--text-faint);font-weight:500;font-family:var(--font-mono);font-size:12px;}
+
+  .lang-toggle{
+    display:flex;gap:2px;background:var(--surface);border:1px solid var(--border);
+    border-radius:999px;padding:3px;font-family:var(--font-mono);font-size:12px;
+  }
+  .lang-toggle button{
+    all:unset;cursor:pointer;padding:5px 12px;border-radius:999px;color:var(--text-faint);
+    transition:background .15s, color .15s;
+  }
+  .lang-toggle button.active{background:var(--surface-2);color:var(--text);}
+
+  /* --- hero --- */
+  .hero{padding:76px 0 64px;}
+  .hero-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center;}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:var(--font-mono);font-size:12.5px;color:var(--ref-green);
+    background:rgba(79,195,138,0.1);border:1px solid rgba(79,195,138,0.25);
+    padding:5px 12px;border-radius:999px;margin-bottom:22px;
+  }
+  h1{
+    font-size:clamp(32px,4.2vw,50px);
+    line-height:1.08;letter-spacing:-0.02em;font-weight:800;
+    margin:0 0 20px;
+  }
+  h1 .accent{color:var(--ref-green);}
+  .lede{font-size:17.5px;color:var(--text-dim);max-width:52ch;margin:0 0 30px;}
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px;}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:12px 20px;border-radius:10px;font-weight:600;font-size:14.5px;
+    text-decoration:none;border:1px solid transparent;transition:transform .15s, background .15s, border-color .15s;
+  }
+  .btn:hover{transform:translateY(-1px);}
+  .btn-primary{background:var(--ref-green);color:#08110d;}
+  .btn-primary:hover{background:#63d49b;}
+  .btn-secondary{background:var(--surface);color:var(--text);border-color:var(--border-strong);}
+  .btn-secondary:hover{border-color:var(--ref-green);}
+  .meta-row{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--font-mono);font-size:12.5px;color:var(--text-faint);}
+  .meta-row span{display:flex;align-items:center;gap:6px;}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--ref-orange);display:inline-block;}
+
+  /* --- hero mockup: recreated Excel cell + formula bar + tooltip --- */
+  .mock{
+    background:var(--surface);border:1px solid var(--border-strong);
+    border-radius:var(--radius);overflow:hidden;
+    box-shadow:0 30px 80px -30px rgba(0,0,0,0.6);
+  }
+  .mock-bar{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 14px;background:var(--surface-2);border-bottom:1px solid var(--border);
+    font-family:var(--font-mono);font-size:11.5px;color:var(--text-faint);
+  }
+  .mock-bar .traffic{display:flex;gap:6px;}
+  .mock-bar .traffic i{width:9px;height:9px;border-radius:50%;background:var(--border-strong);display:block;}
+  .mock-fx{
+    display:flex;align-items:center;gap:10px;
+    padding:12px 14px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:14px;
+  }
+  .mock-fx .fx-label{color:var(--text-faint);font-weight:600;}
+  .mock-fx .fx-input{flex:1;color:var(--text);white-space:nowrap;overflow:hidden;}
+  .mock-fx .caret{display:inline-block;width:2px;height:15px;background:var(--ref-green);margin-left:1px;animation:blink 1s step-end infinite;vertical-align:middle;}
+  @keyframes blink{50%{opacity:0;}}
+
+  .mock-body{padding:14px;}
+  .mock-dropdown{
+    background:var(--bg-soft);border:1px solid var(--border);border-radius:8px;
+    overflow:hidden;margin-bottom:10px;
+  }
+  .mock-dropdown .item{
+    display:flex;align-items:center;gap:8px;padding:7px 12px;
+    font-family:var(--font-mono);font-size:12.5px;color:var(--text-dim);
+    border-bottom:1px solid var(--border);
+  }
+  .mock-dropdown .item:last-child{border-bottom:none;}
+  .mock-dropdown .item.active{background:var(--ref-blue);color:#061420;font-weight:600;}
+  .mock-dropdown .item .ic{
+    width:14px;height:14px;border-radius:3px;background:var(--ref-purple);
+    display:inline-block;opacity:.55;flex-shrink:0;
+  }
+  .mock-dropdown .item.active .ic{background:#061420;opacity:.8;}
+
+  .mock-tooltip{
+    background:var(--bg-soft);border:1px solid var(--border-strong);border-radius:8px;
+    padding:12px 14px;font-family:var(--font-mono);font-size:12.5px;
+  }
+  .mock-tooltip .sig{color:var(--text-dim);margin-bottom:6px;}
+  .mock-tooltip .sig b{color:var(--ref-blue);border-bottom:2px solid var(--ref-blue);padding-bottom:1px;font-weight:700;}
+  .mock-tooltip .desc{color:var(--text-faint);font-family:var(--font-display);font-size:12.5px;}
+
+  /* --- sections --- */
+  section{padding:58px 0;border-top:1px solid var(--border);}
+  .section-head{display:flex;align-items:baseline;gap:14px;margin-bottom:28px;}
+  .section-num{
+    font-family:var(--font-mono);font-size:13px;font-weight:700;
+    color:var(--bg);width:28px;height:28px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  h2{font-size:26px;letter-spacing:-0.01em;margin:0;font-weight:700;}
+  .section-sub{color:var(--text-dim);font-size:15px;max-width:64ch;margin:-14px 0 30px;}
+
+  /* file table */
+  .filetable{width:100%;border-collapse:collapse;font-size:14px;}
+  .filetable th{
+    text-align:left;font-family:var(--font-mono);font-size:11.5px;text-transform:uppercase;
+    letter-spacing:.05em;color:var(--text-faint);padding:0 14px 10px;font-weight:600;
+  }
+  .filetable td{padding:14px;border-top:1px solid var(--border);vertical-align:top;}
+  .filetable tr:hover td{background:var(--surface);}
+  .filetable code{
+    background:var(--surface-2);border:1px solid var(--border);padding:3px 8px;
+    border-radius:6px;font-size:12.5px;color:var(--ref-green);white-space:nowrap;
+  }
+  .filetable .desc{color:var(--text-dim);}
+
+  /* feature cards */
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .card{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:24px;border-top:3px solid var(--ref-blue);
+  }
+  .card.alt{border-top-color:var(--ref-purple);}
+  .card h3{margin:0 0 10px;font-size:17px;}
+  .card p{margin:0 0 14px;color:var(--text-dim);font-size:14.5px;}
+  .card ul{margin:0;padding-left:18px;color:var(--text-dim);font-size:14px;}
+  .card ul li{margin-bottom:6px;}
+  .badge-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+  .badge{
+    font-family:var(--font-mono);font-size:11.5px;padding:4px 9px;border-radius:6px;
+    background:var(--surface-2);border:1px solid var(--border);color:var(--text-dim);
+  }
+
+  /* steps */
+  .steps{display:flex;flex-direction:column;gap:0;}
+  .step{display:flex;gap:20px;padding:22px 0;border-top:1px solid var(--border);}
+  .step:first-child{border-top:none;padding-top:0;}
+  .step-num{
+    font-family:var(--font-mono);font-weight:700;font-size:14px;
+    width:34px;height:34px;border-radius:10px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;color:#08110d;
+  }
+  .step-body h4{margin:2px 0 8px;font-size:16px;}
+  .step-body p{margin:0 0 10px;color:var(--text-dim);font-size:14.5px;}
+  .step-body ol, .step-body ul{margin:8px 0 0;padding-left:20px;color:var(--text-dim);font-size:14px;}
+  .step-body li{margin-bottom:5px;}
+
+  .callout{
+    background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--ref-orange);
+    border-radius:0 10px 10px 0;padding:14px 16px;font-size:14px;color:var(--text-dim);margin-top:14px;
+  }
+  .callout b{color:var(--text);}
+
+  /* code blocks */
+  pre{
+    background:var(--bg-soft);border:1px solid var(--border-strong);border-radius:10px;
+    padding:16px 18px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;
+    line-height:1.65;margin:12px 0;color:var(--text);
+  }
+  pre .cm{color:var(--text-faint);}
+  pre .kw{color:var(--ref-purple);}
+  pre .fn{color:var(--ref-blue);}
+  pre .st{color:var(--ref-green);}
+  pre .tg{color:var(--ref-orange);}
+  pre .at{color:var(--ref-pink);}
+
+  /* limitations list */
+  .limits{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  .limit-card{
+    background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;
+  }
+  .limit-card .num{font-family:var(--font-mono);font-weight:800;font-size:26px;}
+  .limit-card p{margin:6px 0 0;font-size:13.5px;color:var(--text-dim);}
+
+  /* footer */
+  footer{padding:56px 0 64px;text-align:center;}
+  .footer-card{
+    background:linear-gradient(135deg, rgba(79,195,138,0.1), rgba(90,169,230,0.06));
+    border:1px solid var(--border-strong);border-radius:20px;padding:48px 32px;
+  }
+  footer h2{margin-bottom:10px;}
+  footer p{color:var(--text-dim);margin:0 0 26px;}
+  .gh-btn{
+    display:inline-flex;align-items:center;gap:10px;
+    background:var(--text);color:var(--bg);
+    padding:14px 26px;border-radius:12px;font-weight:700;font-size:15.5px;text-decoration:none;
+    transition:transform .15s;
+  }
+  .gh-btn:hover{transform:translateY(-2px);}
+  .foot-meta{margin-top:30px;font-family:var(--font-mono);font-size:12.5px;color:var(--text-faint);}
+  .foot-meta a{text-decoration:underline;text-underline-offset:3px;}
+
+  @media (max-width:860px){
+    .hero-grid{grid-template-columns:1fr;}
+    .cards{grid-template-columns:1fr;}
+    .limits{grid-template-columns:1fr;}
+    .filetable{display:block;overflow-x:auto;white-space:nowrap;}
+  }
+
+  :focus-visible{outline:2px solid var(--ref-green);outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="brand">
+      <span class="fx">fx</span>
+      Excel Intellisense XLL
+    </div>
+    <div class="lang-toggle" role="group" aria-label="Language">
+      <button type="button" data-set-lang="vi">VI</button>
+      <button type="button" data-set-lang="en">EN</button>
+    </div>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow"><span class="dot"></span>
+        <span class="vi">Delphi &middot; XLL 64-bit &middot; Excel</span>
+        <span class="en">Delphi &middot; XLL 64-bit &middot; Excel</span>
+      </div>
+      <h1>
+        <span class="vi">Tooltip IntelliSense cho hàm <span class="accent">VBA</span> của bạn</span>
+        <span class="en">IntelliSense tooltips for <span class="accent">your VBA</span> functions</span>
+      </h1>
+      <p class="lede">
+        <span class="vi">Add-in Excel (.xll, 64-bit) giúp hàm VBA tự viết trong workbook có được tooltip gợi ý tham số giống hệt hàm gốc của Excel &mdash; và tùy chọn gọi được như 1 hàm Excel thật, không cần build lại add-in mỗi khi thêm hàm mới.</span>
+        <span class="en">A 64-bit .xll add-in that gives your own VBA functions the same parameter-hint tooltip as native Excel functions &mdash; and optionally makes them callable as real Excel functions, no rebuild needed when you add a new one.</span>
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/KieuManh366377/excel-intellisense-xll" target="_blank" rel="noopener">
+          <span class="vi">Xem trên GitHub</span><span class="en">View on GitHub</span>
+        </a>
+        <a class="btn btn-secondary" href="https://github.com/KieuManh366377/excel-intellisense-xll/blob/main/ExcelIntellisense64.XLL" target="_blank" rel="noopener">
+          <span class="vi">Tải file .XLL</span><span class="en">Download .XLL</span>
+        </a>
+      </div>
+      <div class="meta-row">
+        <span><span class="dot" style="background:var(--ref-blue)"></span><span class="vi">Excel 64-bit</span><span class="en">Excel 64-bit</span></span>
+        <span><span class="dot" style="background:var(--ref-purple)"></span><span class="vi">Không cần build lại .xll</span><span class="en">No .xll rebuild needed</span></span>
+        <span><span class="dot" style="background:var(--ref-green)"></span>MIT License</span>
+      </div>
+    </div>
+
+    <div class="mock" aria-hidden="true">
+      <div class="mock-bar">
+        <div class="traffic"><i></i><i></i><i></i></div>
+        <span>Book1.xlsm &mdash; A1</span>
+      </div>
+      <div class="mock-fx">
+        <span class="fx-label">fx</span>
+        <span class="fx-input" id="fxInput"></span><span class="caret"></span>
+      </div>
+      <div class="mock-body">
+        <div class="mock-dropdown">
+          <div class="item active"><span class="ic"></span>Cong</div>
+          <div class="item"><span class="ic"></span>CONCAT</div>
+          <div class="item"><span class="ic"></span>CONVERT</div>
+        </div>
+        <div class="mock-tooltip">
+          <div class="sig">Cong( <b>A</b>, B )</div>
+          <div class="desc"><span class="vi">A: Số thứ nhất</span><span class="en">A: first number</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="noi-dung">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num" style="background:var(--ref-blue)">01</span>
+      <h2><span class="vi">Nội dung repo</span><span class="en">What's in this repo</span></h2>
+    </div>
+    <p class="section-sub">
+      <span class="vi">Đây là bản phát hành dạng binary (.xll đã build sẵn). Repo này không chia sẻ mã nguồn Delphi của add-in &mdash; chỉ chia sẻ file .xll đã build, file demo, và phần cấu hình XML/VBA mà bạn có thể tự chỉnh sửa để mở rộng hàm của riêng mình.</span>
+      <span class="en">This is a pre-built binary release. This repo does not include the add-in's Delphi source &mdash; only the built .xll, a demo workbook, and the XML/VBA config files you edit yourself to add your own functions.</span>
+    </p>
+
+    <table class="filetable">
+      <thead>
+        <tr>
+          <th style="width:220px"><span class="vi">Tệp tin</span><span class="en">File</span></th>
+          <th><span class="vi">Mô tả</span><span class="en">Description</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>ExcelIntellisense64.XLL</code></td>
+          <td class="desc"><span class="vi">Add-in Excel 64-bit đã build sẵn &mdash; không kèm mã nguồn.</span><span class="en">Pre-built 64-bit Excel add-in &mdash; no source included.</span></td>
+        </tr>
+        <tr>
+          <td><code>ExcelIntellisense64_Demo.xlsb</code></td>
+          <td class="desc"><span class="vi">Workbook demo, đã import sẵn modVBAFunctions.bas, dùng để test nhanh không cần tự setup.</span><span class="en">Demo workbook with modVBAFunctions.bas already imported, for a quick test with zero setup.</span></td>
+        </tr>
+        <tr>
+          <td><code>VBAFunctions.xml</code></td>
+          <td class="desc"><span class="vi">Khai báo danh sách hàm VBA cần có tooltip / đăng ký làm hàm Excel thật. Tự sửa file này để thêm hàm mới, không cần build lại .xll.</span><span class="en">Declares which VBA functions get a tooltip / get registered as a real Excel function. Edit this to add functions &mdash; no .xll rebuild needed.</span></td>
+        </tr>
+        <tr>
+          <td><code>modVBAFunctions.bas</code></td>
+          <td class="desc"><span class="vi">Module VBA mẫu (Cong, Tru, Nhan, Chia + TinhTongCoDieuKien) minh họa cách viết hàm tương thích với add-in.</span><span class="en">Sample VBA module (Cong, Tru, Nhan, Chia + TinhTongCoDieuKien) showing how to write a compatible function.</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="tinh-nang">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num" style="background:var(--ref-purple)">02</span>
+      <h2><span class="vi">Add-in này làm được gì</span><span class="en">What this add-in does</span></h2>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <h3><span class="vi">Tooltip IntelliSense cho hàm VBA</span><span class="en">IntelliSense tooltip for VBA functions</span></h3>
+        <p><span class="vi">Gõ <code>=TenHam(</code> trong 1 ô, add-in hiện tooltip ngay dưới thanh công thức gồm:</span>
+           <span class="en">Type <code>=YourFunction(</code> in a cell and a tooltip appears right under the formula bar with:</span></p>
+        <ul>
+          <li><span class="vi">Tên hàm và danh sách tham số &mdash; tham số đang gõ được in đậm.</span><span class="en">Function name and parameter list &mdash; the current parameter is bolded.</span></li>
+          <li><span class="vi">Mô tả của tham số đang gõ.</span><span class="en">Description of the current parameter.</span></li>
+          <li><span class="vi">Mô tả tổng quát của hàm.</span><span class="en">General description of the function.</span></li>
+        </ul>
+        <p style="margin-top:14px"><span class="vi">Toàn bộ nội dung lấy từ <code>VBAFunctions.xml</code>. Tooltip cũng tự hiện lại khi mở file cũ, double-click vào ô có công thức, hoặc nhấn F2.</span><span class="en">All content comes from <code>VBAFunctions.xml</code>. It also reappears when reopening a saved formula, double-clicking a formula cell, or pressing F2.</span></p>
+      </div>
+
+      <div class="card alt">
+        <h3><span class="vi">Cầu nối gọi hàm VBA như hàm Excel thật</span><span class="en">Bridge: call VBA like a real Excel function</span></h3>
+        <p><span class="vi">Tùy chọn: hàm VBA xuất hiện trong AutoComplete / Insert Function như 1 hàm Excel thật. Khi được gọi, add-in chuyển tiếp sang đúng hàm VBA cùng tên &mdash; logic tính toán luôn nằm ở VBA.</span>
+           <span class="en">Optional: your VBA function shows up in AutoComplete / Insert Function like a real Excel function. When called, the add-in forwards the call to the matching VBA function &mdash; all logic stays in VBA.</span></p>
+        <div class="badge-row">
+          <span class="badge">&le; 20 <span class="vi">hàm / phiên Excel</span><span class="en">functions / session</span></span>
+          <span class="badge">&le; 16 <span class="vi">tham số / hàm</span><span class="en">params / function</span></span>
+          <span class="badge">Range + <span class="vi">giá trị thường</span><span class="en">plain values</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cach-dung">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num" style="background:var(--ref-pink)">03</span>
+      <h2><span class="vi">Các cách kích hoạt tooltip</span><span class="en">Ways to trigger the tooltip</span></h2>
+    </div>
+    <p class="section-sub">
+      <span class="vi">Ngoài việc gõ trực tiếp, tooltip còn phản hồi theo nhiều thao tác khác nhau trên bàn phím và chuột &mdash; mỗi thao tác cho kết quả khác nhau, nên biết rõ để tránh nhầm lẫn khi dùng.</span>
+      <span class="en">Besides typing, the tooltip also responds to several other keyboard and mouse actions &mdash; each gives a different result, so it's worth knowing them to avoid confusion.</span>
+    </p>
+
+    <table class="filetable">
+      <thead>
+        <tr>
+          <th style="width:230px"><span class="vi">Thao tác</span><span class="en">Action</span></th>
+          <th><span class="vi">Kết quả</span><span class="en">Result</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code><span class="vi">Gõ</span><span class="en">Type</span> "=Cong" + Tab</code></td>
+          <td class="desc">
+            <span class="vi">Nếu AutoComplete của Excel đang gợi ý đúng 1 hàm khớp, Tab sẽ tự hoàn tất tên hàm kèm dấu ngoặc mở &mdash; tooltip tham số hiện ra ngay lập tức.</span>
+            <span class="en">If Excel's AutoComplete is currently suggesting a single matching function, Tab auto-completes the name with an opening parenthesis &mdash; the parameter tooltip appears immediately.</span>
+          </td>
+        </tr>
+        <tr>
+          <td><code>F2</code></td>
+          <td class="desc">
+            <span class="vi">Nhấn F2 trên 1 ô <b style="color:var(--text)">đã có sẵn công thức</b> &mdash; add-in đọc lại đúng công thức đã lưu của ô và hiện tooltip ngay, không cần gõ lại từ đầu.</span>
+            <span class="en">Press F2 on a cell that <b style="color:var(--text)">already has a formula</b> &mdash; the add-in re-reads the saved formula and shows the tooltip immediately, no retyping needed.</span>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="vi">Double-click vào ô có công thức</span><span class="en">Double-click a formula cell</span></td>
+          <td class="desc">
+            <span class="vi">Double-click trực tiếp vào 1 ô đang có công thức sẵn (không qua thanh công thức) &mdash; hoạt động giống F2: tooltip hiện lại để bạn sửa tiếp.</span>
+            <span class="en">Double-clicking directly on a cell that already has a formula (not via the formula bar) &mdash; behaves like F2: the tooltip reappears so you can keep editing.</span>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="vi">Click chuột vào 1 gợi ý</span><span class="en">Click a suggestion</span></td>
+          <td class="desc">
+            <span class="vi">Click (hoặc double-click) trực tiếp vào 1 dòng trong danh sách gợi ý AutoComplete &mdash; hàm đó được chọn ngay lập tức, tooltip tham số hiện ra y hệt như khi dùng Tab.</span>
+            <span class="en">Clicking (or double-clicking) directly on a row in the AutoComplete suggestion list &mdash; that function is selected immediately, and the parameter tooltip appears just like with Tab.</span>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="vi">Phím mũi tên lên / xuống</span><span class="en">Up / Down arrow keys</span></td>
+          <td class="desc">
+            <span class="vi">Chỉ <b style="color:var(--text)">di chuyển vùng tô sáng</b> để xem trước các gợi ý, <b style="color:var(--text)">chưa thực sự chọn</b> &mdash; cần Tab, Enter, hoặc click chuột thì tooltip mới hiện đúng hàm đang tô sáng.</span>
+            <span class="en">Only <b style="color:var(--text)">moves the highlight</b> to preview suggestions &mdash; it does <b style="color:var(--text)">not commit</b> a selection yet. Press Tab, Enter, or click to actually select and show the tooltip for the highlighted function.</span>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="vi">Delete, mũi tên trái/phải, Home/End giữa công thức</span><span class="en">Delete, Left/Right arrows, Home/End mid-formula</span></td>
+          <td class="desc">
+            <span class="vi">Tooltip <b style="color:var(--text)">tự ẩn</b> thay vì cố hiện tiếp &mdash; vì add-in không biết chắc vị trí con trỏ đã đổi ra sao sau các thao tác này, nên chủ động ẩn để tránh hiện sai. Gõ tiếp bình thường sẽ có tooltip trở lại ngay khi khớp đúng tên hàm.</span>
+            <span class="en">The tooltip <b style="color:var(--text)">hides itself</b> rather than risk showing stale info &mdash; the add-in can't reliably tell where the cursor ended up after these actions. Keep typing normally and the tooltip returns as soon as a function name matches again.</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="yeu-cau">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num" style="background:var(--ref-orange)">04</span>
+      <h2><span class="vi">Yêu cầu hệ thống</span><span class="en">System requirements</span></h2>
+    </div>
+    <ul style="color:var(--text-dim);font-size:15px;padding-left:20px;margin:0;">
+      <li><span class="vi">Windows, Microsoft Excel bản <b style="color:var(--text)">64-bit</b> (đã test trên Excel 2024 / Windows 11).</span><span class="en">Windows, Microsoft Excel <b style="color:var(--text)">64-bit</b> (tested on Excel 2024 / Windows 11).</span></li>
+      <li><span class="vi">Excel phải cho phép chạy Macro (VBA) và load Add-in .xll.</span><span class="en">Excel must allow running Macros (VBA) and loading .xll add-ins.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="cai-dat">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num" style="background:var(--ref-green)">05</span>
+      <h2><span class="vi">Cài đặt</span><span class="en">Installation</span></h2>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num" style="background:var(--ref-blue)">1</div>
+        <div class="step-body">
+          <h4><span class="vi">Chuẩn bị thư mục</span><span class="en">Prepare a folder</span></h4>
+          <p><span class="vi">Đặt <code>ExcelIntellisense64.XLL</code> và <code>VBAFunctions.xml</code> vào <b style="color:var(--text)">cùng 1 thư mục</b> (bất kỳ đâu, không bắt buộc cấu trúc cố định).</span>
+             <span class="en">Put <code>ExcelIntellisense64.XLL</code> and <code>VBAFunctions.xml</code> in the <b style="color:var(--text)">same folder</b> (anywhere &mdash; no fixed structure required).</span></p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num" style="background:var(--ref-purple)">2</div>
+        <div class="step-body">
+          <h4><span class="vi">Nạp add-in vào Excel</span><span class="en">Load the add-in into Excel</span></h4>
+          <p><b style="color:var(--text)"><span class="vi">Cách 1 &mdash; Nạp cố định (khuyến nghị):</span><span class="en">Option 1 &mdash; Permanent (recommended):</span></b></p>
+          <ol>
+            <li><span class="vi">Mở Excel &gt; File &gt; Options &gt; Add-ins.</span><span class="en">Open Excel &gt; File &gt; Options &gt; Add-ins.</span></li>
+            <li><span class="vi">Ọn Manage, chọn Excel Add-ins &gt; bấm Go...</span><span class="en">In Manage, choose Excel Add-ins &gt; click Go...</span></li>
+            <li><span class="vi">Bấm Browse..., chọn file ExcelIntellisense64.XLL.</span><span class="en">Click Browse..., select ExcelIntellisense64.XLL.</span></li>
+            <li><span class="vi">Bấm OK, đảm bảo add-in đã được tick chọn.</span><span class="en">Click OK, make sure the add-in is checked.</span></li>
+          </ol>
+          <p style="margin-top:12px"><b style="color:var(--text)"><span class="vi">Cách 2 &mdash; Nạp tạm (chỉ cho session hiện tại):</span><span class="en">Option 2 &mdash; Temporary (this session only):</span></b><br>
+          <span class="vi">Double-click trực tiếp vào file .xll khi Excel đang mở, hoặc kéo-thả vào Excel.</span>
+          <span class="en">Double-click the .xll file while Excel is open, or drag-and-drop it into Excel.</span></p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num" style="background:var(--ref-green)">3</div>
+        <div class="step-body">
+          <h4><span class="vi">Thêm hàm VBA của bạn</span><span class="en">Add your VBA function</span></h4>
+          <p><b style="color:var(--text)"><span class="vi">Cách A &mdash; Dùng file demo:</span><span class="en">Option A &mdash; Use the demo file:</span></b>
+          <span class="vi">Mở <code>ExcelIntellisense64_Demo.xlsb</code>, đảm bảo add-in đã nạp, gõ thử <code>=Cong(</code> trong 1 ô.</span>
+          <span class="en">Open <code>ExcelIntellisense64_Demo.xlsb</code>, make sure the add-in is loaded, try typing <code>=Cong(</code> in a cell.</span></p>
+          <p><b style="color:var(--text)"><span class="vi">Cách B &mdash; Dùng workbook riêng:</span><span class="en">Option B &mdash; Use your own workbook:</span></b></p>
+          <ol>
+            <li><span class="vi">Mở workbook, nhấn Alt+F11 để mở VBA Editor.</span><span class="en">Open your workbook, press Alt+F11 to open the VBA Editor.</span></li>
+            <li><span class="vi">File &gt; Import File... &gt; chọn modVBAFunctions.bas (hoặc module của bạn).</span><span class="en">File &gt; Import File... &gt; select modVBAFunctions.bas (or your own module).</span></li>
+            <li><span class="vi">Lưu workbook dạng có Macro (.xlsm hoặc .xlsb).</span><span class="en">Save the workbook as macro-enabled (.xlsm or .xlsb).</span></li>
+            <li><span class="vi">Đóng và mở lại Excel để add-in nạp lại VBAFunctions.xml.</span><span class="en">Close and reopen Excel so the add-in reloads VBAFunctions.xml.</span></li>
+          </ol>
+          <div class="callout">
+            <b><span class="vi">Lưu ý:</span><span class="en">Note:</span></b>
+            <span class="vi">Add-in chỉ đọc VBAFunctions.xml 1 lần lúc Excel mở. Sửa XML hoặc VBA xong phải đóng và mở lại Excel &mdash; không có nút "Reload".</span>
+            <span class="en">The add-in only reads VBAFunctions.xml once, when Excel opens the add-in. After editing XML or VBA, close and reopen Excel &mdash; there is no "Reload" button.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="them-ham">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num" style="background:var(--ref-blue)">06</span>
+      <h2><span class="vi">Thêm hàm VBA mới</span><span class="en">Adding a new VBA function</span></h2>
+    </div>
+    <p class="section-sub"><span class="vi">Không cần build lại .xll &mdash; chỉ cần sửa VBA và XML.</span><span class="en">No .xll rebuild &mdash; just edit VBA and XML.</span></p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num" style="background:var(--ref-blue)">5.1</div>
+        <div class="step-body">
+          <h4><span class="vi">Viết hàm trong VBA</span><span class="en">Write the VBA function</span></h4>
+<pre><span class="kw">Private</span> <span class="fn">Function</span> TenHam(A <span class="kw">As</span> Double, B <span class="kw">As</span> Double) <span class="kw">As</span> Double
+    TenHam = A + B
+<span class="kw">End</span> <span class="fn">Function</span></pre>
+          <p><b style="color:var(--text)"><span class="vi">Lưu ý quan trọng:</span><span class="en">Important:</span></b></p>
+          <ul>
+            <li><span class="vi">Khai báo là <code>Private Function</code>, không phải <code>Public</code>. Nếu để Public, Excel sẽ tự động liệt kê hàm này ra làm 1 UDF riêng, gây trùng với hàm add-in đăng ký cùng tên &mdash; kết quả là gõ <code>=tenham</code> sẽ thấy 2 dòng trùng nhau. Hàm <code>Private</code> add-in vẫn gọi được bình thường, chỉ Excel không tự liệt kê nó ra ngoài.</span>
+            <span class="en">Declare it as <code>Private Function</code>, not <code>Public</code>. If left Public, Excel auto-lists it as its own UDF, colliding with the one the add-in registers under the same name &mdash; typing <code>=yourfunction</code> then shows 2 duplicate entries. A <code>Private</code> function is still callable by the add-in &mdash; Excel just stops auto-listing it.</span></li>
+            <li><span class="vi">Phải là <code>Function</code> (có giá trị trả về), không dùng <code>Sub</code>.</span><span class="en">Must be a <code>Function</code> (returns a value), not a <code>Sub</code>.</span></li>
+            <li><span class="vi">Tham số có thể là giá trị thường (Double, String, Boolean...) hoặc Range.</span><span class="en">Parameters can be plain values (Double, String, Boolean...) or a Range.</span></li>
+            <li><span class="vi">Module chứa hàm phải nằm trong 1 workbook/add-in đang mở khi gọi hàm.</span><span class="en">The module must be in a workbook/add-in that is open when the function is called.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num" style="background:var(--ref-purple)">5.2</div>
+        <div class="step-body">
+          <h4><span class="vi">Khai báo trong VBAFunctions.xml</span><span class="en">Declare it in VBAFunctions.xml</span></h4>
+<pre>&lt;<span class="tg">Function</span> <span class="at">name</span>=<span class="st">"TenHam"</span>&gt;
+  &lt;<span class="tg">Description</span>&gt;Mo ta ngan gon chuc nang cua ham&lt;/<span class="tg">Description</span>&gt;
+  &lt;<span class="tg">Param</span> <span class="at">name</span>=<span class="st">"A"</span>&gt;Mo ta tham so A&lt;/<span class="tg">Param</span>&gt;
+  &lt;<span class="tg">Param</span> <span class="at">name</span>=<span class="st">"B"</span>&gt;Mo ta tham so B&lt;/<span class="tg">Param</span>&gt;
+&lt;/<span class="tg">Function</span>&gt;</pre>
+          <ul>
+            <li><span class="vi"><code>name</code> của Function và Param không được để trống.</span><span class="en"><code>name</code> on Function and Param cannot be empty.</span></li>
+            <li><span class="vi">Tham số tùy chọn: bao tên trong dấu ngoặc vuông, ví dụ <code>name="[Dieu_Kien]"</code>.</span><span class="en">Optional parameter: wrap the name in brackets, e.g. <code>name="[Condition]"</code>.</span></li>
+            <li><span class="vi">Thứ tự Function/Param trong XML là thứ tự hiển thị trong tooltip.</span><span class="en">The order of Function/Param in the XML is the display order in the tooltip.</span></li>
+            <li><span class="vi">1 Function hoặc Param khai báo sai chỉ bị bỏ qua đúng phần đó, không làm mất tooltip của các hàm còn lại.</span><span class="en">A malformed Function or Param is simply skipped &mdash; it won't break the tooltips for other functions.</span></li>
+            <li><span class="vi"><code>name</code> chính là tên bạn sẽ gõ trong Excel, và phải khớp đúng tên hàm VBA thật.</span><span class="en"><code>name</code> is exactly what you type in Excel, and must match the real VBA function name.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num" style="background:var(--ref-green)">5.3</div>
+        <div class="step-body">
+          <h4><span class="vi">Đóng và mở lại Excel</span><span class="en">Close and reopen Excel</span></h4>
+          <p><span class="vi">Sửa xong cả VBA và XML, đóng hoàn toàn Excel rồi mở lại để add-in nạp lại danh sách hàm.</span>
+             <span class="en">After editing both VBA and XML, fully close Excel and reopen it so the add-in reloads the function list.</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="luu-y">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num" style="background:var(--ref-purple)">07</span>
+      <h2><span class="vi">Một số lưu ý khi dùng</span><span class="en">Usage notes</span></h2>
+    </div>
+    <div class="limits">
+      <div class="limit-card">
+        <div class="num" style="color:var(--ref-blue)">20</div>
+        <p><span class="vi">hàm tối đa được đăng ký làm hàm Excel thật trong 1 lần chạy Excel. Hơn số này vẫn có tooltip, chỉ không gọi được như hàm thật.</span>
+           <span class="en">max functions registered as real Excel functions per Excel session. Beyond that, tooltip still works, just not callable as a real function.</span></p>
+      </div>
+      <div class="limit-card">
+        <div class="num" style="color:var(--ref-purple)">16</div>
+        <p><span class="vi">tham số tối đa cho mỗi hàm đăng ký làm hàm Excel thật. Hơn số này sẽ không được đăng ký vì lý do tương tự.</span>
+           <span class="en">max parameters per function registered as a real Excel function &mdash; the same fallback applies.</span></p>
+      </div>
+      <div class="limit-card">
+        <div class="num" style="color:var(--ref-pink)">*</div>
+        <p><span class="vi">Trong vài trường hợp sửa công thức phức tạp (mũi tên, Delete giữa chuỗi...), tooltip có thể tự ẩn thay vì hiện sai &mdash; đây là hành vi có chủ đích.</span>
+           <span class="en">In some complex edit cases (arrow keys, Delete mid-string...) the tooltip hides itself instead of showing something wrong &mdash; this is intentional.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-card">
+      <h2><span class="vi">Sẵn sàng thử chưa?</span><span class="en">Ready to try it?</span></h2>
+      <p><span class="vi">Toàn bộ file, mã nguồn VBA mẫu, và hướng dẫn chi tiết đang nằm trên GitHub.</span>
+         <span class="en">All files, sample VBA source, and full instructions live on GitHub.</span></p>
+      <a class="gh-btn" href="https://github.com/KieuManh366377/excel-intellisense-xll" target="_blank" rel="noopener">
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        <span class="vi">Xem repo trên GitHub</span><span class="en">View repo on GitHub</span>
+      </a>
+      <div class="foot-meta">
+        <span class="vi">Kiều Mạnh &middot; <a href="mailto:kieumanh366377@gmail.com">kieumanh366377@gmail.com</a> &middot; MIT License</span>
+        <span class="en">Kieu Manh &middot; <a href="mailto:kieumanh366377@gmail.com">kieumanh366377@gmail.com</a> &middot; MIT License</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var STORE_KEY = 'xll-lang-pref';
+  var html = document.documentElement;
+
+  function apply(lang){
+    html.setAttribute('data-lang', lang);
+    html.setAttribute('lang', lang);
+    document.querySelectorAll('.lang-toggle button').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-set-lang') === lang);
+    });
+  }
+
+  function detect(){
+    var saved = localStorage.getItem(STORE_KEY);
+    if(saved === 'vi' || saved === 'en') return saved;
+    var nav = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+    return nav.indexOf('vi') === 0 ? 'vi' : 'en';
+  }
+
+  apply(detect());
+
+  document.querySelectorAll('.lang-toggle button').forEach(function(b){
+    b.addEventListener('click', function(){
+      var lang = b.getAttribute('data-set-lang');
+      localStorage.setItem(STORE_KEY, lang);
+      apply(lang);
+    });
+  });
+
+  /* hero formula-bar typewriter, purely decorative */
+  var target = '=Cong(A1, B1)';
+  var el = document.getElementById('fxInput');
+  if(el && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    var i = 0, deleting = false;
+    function tick(){
+      el.textContent = target.slice(0, i);
+      if(!deleting){
+        i++;
+        if(i > target.length){ deleting = true; setTimeout(tick, 1800); return; }
+      } else {
+        i--;
+        if(i < 0){ deleting = false; i = 0; }
+      }
+      setTimeout(tick, deleting ? 40 : 90);
+    }
+    tick();
+  } else if (el) {
+    el.textContent = target;
+  }
+})();
+</script>
+
+</body>
+</html>
