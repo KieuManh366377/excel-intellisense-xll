@@ -138,6 +138,3 @@ Email: kieumanh366377@gmail.com
 
 ---
 
-## 8. Giấy phép
-
-Ghi rõ giấy phép sử dụng (ví dụ MIT, hoặc "chỉ dùng phi thương mại", tùy bạn quyết định) trước khi công khai repo. Phần này để trống, bạn tự điền theo mong muốn.
