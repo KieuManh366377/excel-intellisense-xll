@@ -24,19 +24,26 @@ Khi gõ `=TenHam(` trong 1 ô, add-in hiện 1 tooltip ngay dưới thanh công 
 - Tên hàm và danh sách tham số (tham số đang gõ được in đậm/gạch dưới để dễ nhận biết).
 - Mô tả của tham số đang gõ.
 - Mô tả tổng quát của hàm.
+- Nếu tham số tùy chọn có khai báo giá trị mặc định trong XML, tên tham số sẽ hiện kèm giá trị đó ngay trong tooltip, ví dụ `Dieu_Kien [optional, mac dinh = rong]`.
 
 Toàn bộ nội dung tooltip lấy từ file `VBAFunctions.xml` - không cần viết thêm gì trong VBA để có tooltip.
 
 Tooltip cũng tự hiện lại đúng nội dung khi:
 - Mở lại file đã lưu rồi bấm vào 1 ô có sẵn công thức để sửa tham số.
-- Double-click trực tiếp vào ô có công thức.
+- Double-click vào 1 ô đang có công thức, hoặc double-click ngay trên thanh công thức trong lúc sửa - áp dụng ở bất kỳ vị trí nào tooltip có thể hiện.
+- Click (hoặc double-click) trực tiếp vào 1 dòng gợi ý trong danh sách AutoComplete - hàm được chọn ngay, tooltip hiện ra như khi dùng Tab.
 - Nhấn F2 để sửa công thức có sẵn.
 
 ### 2.2. Cầu nối gọi hàm VBA như hàm Excel thật (tùy chọn)
 Nếu muốn hàm VBA xuất hiện trong AutoComplete/Insert Function của Excel như 1 hàm thật (không chỉ có tooltip khi gõ tay đúng tên), add-in đọc thêm `VBAFunctions.xml` để tự đăng ký hàm đó với Excel. Khi được gọi, add-in chuyển tiếp lời gọi sang đúng hàm VBA cùng tên trong workbook đang mở để lấy kết quả - **logic tính toán luôn nằm ở VBA**, add-in chỉ đóng vai trò cầu nối.
 
+Các cải tiến của cầu nối này:
+- Hộp thoại Insert Function (`fx`) xếp hàm vào đúng nhóm (category) khai báo trong XML, thay vì luôn rơi vào nhóm "User Defined".
+- Hộp thoại Function Arguments hiện đúng tên từng tham số (argumentText) thay vì "Argument1, Argument2..." chung chung.
+- Lỗi từ VBA trả về đúng loại lỗi Excel tương ứng (`#NAME?`, `#NUM?`, `#VALUE!`...) thay vì luôn ép về `#VALUE!`.
+
 Giới hạn của cơ chế cầu nối này:
-- Tối đa 20 hàm được đăng ký kiểu này trong 1 lần chạy Excel.
+- Tối đa 50 hàm được đăng ký kiểu này trong 1 lần chạy Excel.
 - Tối đa 16 tham số cho mỗi hàm.
 - Tham số hỗ trợ cả giá trị thường (số/chuỗi/mảng) và tham chiếu Range thật (đọc được `.Address`, `.Cells`, định dạng...).
 
@@ -79,9 +86,8 @@ Mở `ExcelIntellisense64_Demo.xlsb` (đã import sẵn `modVBAFunctions.bas`), 
 1. Mở workbook cần dùng, nhấn `Alt+F11` để mở VBA Editor.
 2. `File` > `Import File...` > chọn `modVBAFunctions.bas` (hoặc module VBA của riêng bạn, xem mục 5 để biết quy tắc viết hàm tương thích).
 3. Lưu workbook dạng có Macro (`.xlsm` hoặc `.xlsb`).
-4. Đóng và mở lại Excel để add-in nạp lại `VBAFunctions.xml`.
 
-> Add-in chỉ đọc `VBAFunctions.xml` **1 lần lúc Excel mở add-in**. Sửa file XML hoặc sửa code VBA xong phải **đóng và mở lại Excel** để nạp lại, không có nút "Reload".
+> **HotReload:** Add-in tự theo dõi thay đổi của `VBAFunctions.xml` và nạp lại ngay trong vài giây - không cần đóng và mở lại Excel mỗi khi sửa mô tả hàm, thêm/xóa tham số, hay khai báo hàm mới trong XML. Riêng module VBA hoàn toàn mới (bước 2 ở trên) vẫn cần Import vào workbook đang dùng - đây là giới hạn của VBA/Excel, không phải của add-in.
 
 ---
 
@@ -102,29 +108,31 @@ Lưu ý quan trọng:
 
 ### 5.2. Khai báo trong VBAFunctions.xml
 ```xml
-<Function name="TenHam">
+<Function name="TenHam" category="Toan hoc">
   <Description>Mo ta ngan gon chuc nang cua ham</Description>
   <Param name="A">Mo ta tham so A</Param>
-  <Param name="B">Mo ta tham so B</Param>
+  <Param name="[B]" default="0">Mo ta tham so B (tuy chon)</Param>
 </Function>
 ```
 
 Quy ước:
 - `name` của `<Function>` và `<Param>` không được để trống.
 - Tham số tùy chọn: bọc tên trong dấu ngoặc vuông, ví dụ `name="[Dieu_Kien]"`.
+- Thuộc tính `category` trên `<Function>` (tùy chọn) quy định nhóm hiển thị trong Insert Function - bỏ trống thì Excel tự xếp vào nhóm "User Defined".
+- Thuộc tính `default` trên `<Param>` tùy chọn (tùy chọn) ghi giá trị mặc định của tham số đó - hiện kèm ngay trong tooltip.
 - Thứ tự `<Function>`, `<Param>` trong XML là thứ tự hiển thị trong tooltip.
 - 1 `<Function>` hoặc `<Param>` khai báo sai (thiếu `name`, XML lỗi cú pháp...) chỉ bị bỏ qua đúng phần đó, không làm mất tooltip của các hàm còn lại trong file.
 - Tên trong thuộc tính `name` chính là tên bạn sẽ gõ trong Excel (ví dụ `name="TenHam"` thì gõ `=TenHam(`), và cũng phải khớp đúng tên hàm VBA thật đã viết ở bước 5.1.
 
-### 5.3. Đóng và mở lại Excel
-Sửa xong cả VBA và XML, đóng hoàn toàn Excel rồi mở lại để add-in nạp lại danh sách hàm.
+### 5.3. Lưu XML - add-in tự nạp lại
+Nhờ HotReload, chỉ cần lưu file `VBAFunctions.xml` là tooltip cập nhật ngay trong Excel đang mở, không cần đóng và mở lại. Riêng module VBA ở bước 5.1 vẫn phải Import vào workbook đang dùng nếu đó là module hoàn toàn mới.
 
 ---
 
 ## 6. Một số lưu ý khi dùng
 
 - Tooltip dựa trên việc bắt từng ký tự gõ trong thanh công thức, nên trong vài trường hợp gõ/sửa công thức phức tạp (dùng phím mũi tên di chuyển giữa các tham số đã gõ, Delete giữa chuỗi...), tooltip có thể tự ẩn đi thay vì hiển thị sai - đây là hành vi có chủ đích (ưu tiên không hiện tooltip sai hơn là hiện sai).
-- Nếu thêm quá 20 hàm vào phần "cầu nối gọi như hàm Excel thật" (mục 2.2), các hàm dư sẽ không được đăng ký làm hàm Excel thật (tooltip khi gõ tay vẫn hoạt động bình thường).
+- Nếu thêm quá 50 hàm vào phần "cầu nối gọi như hàm Excel thật" (mục 2.2), các hàm dư sẽ không được đăng ký làm hàm Excel thật (tooltip khi gõ tay vẫn hoạt động bình thường).
 - Hàm có quá 16 tham số sẽ không được đăng ký làm hàm Excel thật vì lý do tương tự.
 
 ---
