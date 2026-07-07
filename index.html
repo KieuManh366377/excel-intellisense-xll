@@ -5,6 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Excel Intellisense XLL &mdash; Tooltip IntelliSense cho hàm VBA</title>
 <meta name="description" content="Add-in Excel (.xll 64-bit) thêm tooltip gợi ý tham số cho hàm VBA tự viết, tùy chọn cầu nối gọi như hàm Excel thật.">
+
+<!-- Open Graph: can tao file anh that og-image.png (1200x630) dat cung thu muc voi index.html, va xac nhan lai og:url dung voi domain GitHub Pages thuc te truoc khi publish -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Excel Intellisense XLL">
+<meta property="og:url" content="https://kieumanh366377.github.io/excel-intellisense-xll/">
+<meta property="og:title" content="Excel Intellisense XLL &mdash; Tooltip IntelliSense cho hàm VBA">
+<meta property="og:description" content="Add-in Excel (.xll 64-bit) thêm tooltip gợi ý tham số cho hàm VBA tự viết, tùy chọn cầu nối gọi như hàm Excel thật.">
+<meta property="og:image" content="https://kieumanh366377.github.io/excel-intellisense-xll/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="vi_VN">
+<meta property="og:locale:alternate" content="en_US">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Excel Intellisense XLL &mdash; Tooltip IntelliSense cho hàm VBA">
+<meta name="twitter:description" content="Add-in Excel (.xll 64-bit) thêm tooltip gợi ý tham số cho hàm VBA tự viết, tùy chọn cầu nối gọi như hàm Excel thật.">
+<meta name="twitter:image" content="https://kieumanh366377.github.io/excel-intellisense-xll/og-image.png">
+
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -400,6 +418,7 @@
           <li><span class="vi">Tên hàm và danh sách tham số &mdash; tham số đang gõ được in đậm.</span><span class="en">Function name and parameter list &mdash; the current parameter is bolded.</span></li>
           <li><span class="vi">Mô tả của tham số đang gõ.</span><span class="en">Description of the current parameter.</span></li>
           <li><span class="vi">Mô tả tổng quát của hàm.</span><span class="en">General description of the function.</span></li>
+          <li><span class="vi">Tham số tùy chọn có khai báo giá trị mặc định sẽ hiện kèm giá trị đó ngay trong tên tham số, ví dụ <code>Dieu_Kien [optional, mac dinh = rong]</code>.</span><span class="en">An optional parameter with a declared default value shows that default right in the parameter name, e.g. <code>Condition [optional, default = empty]</code>.</span></li>
         </ul>
         <p style="margin-top:14px"><span class="vi">Toàn bộ nội dung lấy từ <code>VBAFunctions.xml</code>. Tooltip cũng tự hiện lại khi mở file cũ, double-click vào ô có công thức, hoặc nhấn F2.</span><span class="en">All content comes from <code>VBAFunctions.xml</code>. It also reappears when reopening a saved formula, double-clicking a formula cell, or pressing F2.</span></p>
       </div>
@@ -408,10 +427,16 @@
         <h3><span class="vi">Cầu nối gọi hàm VBA như hàm Excel thật</span><span class="en">Bridge: call VBA like a real Excel function</span></h3>
         <p><span class="vi">Tùy chọn: hàm VBA xuất hiện trong AutoComplete / Insert Function như 1 hàm Excel thật. Khi được gọi, add-in chuyển tiếp sang đúng hàm VBA cùng tên &mdash; logic tính toán luôn nằm ở VBA.</span>
            <span class="en">Optional: your VBA function shows up in AutoComplete / Insert Function like a real Excel function. When called, the add-in forwards the call to the matching VBA function &mdash; all logic stays in VBA.</span></p>
+        <ul>
+          <li><span class="vi">Hộp thoại Insert Function (fx) xếp hàm vào đúng nhóm (category) bạn khai báo trong XML, thay vì luôn rơi vào nhóm "User Defined".</span><span class="en">The Insert Function dialog (fx) places your function under the category you declare in the XML, instead of always falling into "User Defined".</span></li>
+          <li><span class="vi">Hộp thoại Function Arguments hiện đúng tên từng tham số (argumentText) thay vì "Argument1, Argument2..." chung chung.</span><span class="en">The Function Arguments dialog shows each parameter's real name (argumentText) instead of generic "Argument1, Argument2..." labels.</span></li>
+          <li><span class="vi">Lỗi từ VBA trả về đúng loại lỗi Excel tương ứng (<code>#NAME?</code>, <code>#NUM?</code>, <code>#VALUE!</code>...) thay vì luôn ép về <code>#VALUE!</code>.</span><span class="en">Errors from VBA come back as the matching Excel error type (<code>#NAME?</code>, <code>#NUM?</code>, <code>#VALUE!</code>...) instead of always forcing <code>#VALUE!</code>.</span></li>
+        </ul>
         <div class="badge-row">
-          <span class="badge">&le; 20 <span class="vi">hàm / phiên Excel</span><span class="en">functions / session</span></span>
+          <span class="badge">&le; 50 <span class="vi">hàm / phiên Excel</span><span class="en">functions / session</span></span>
           <span class="badge">&le; 16 <span class="vi">tham số / hàm</span><span class="en">params / function</span></span>
           <span class="badge">Range + <span class="vi">giá trị thường</span><span class="en">plain values</span></span>
+          <span class="badge"><span class="vi">Nhóm (category) trong Insert Function</span><span class="en">Category in Insert Function</span></span>
         </div>
       </div>
     </div>
@@ -452,17 +477,17 @@
           </td>
         </tr>
         <tr>
-          <td><span class="vi">Double-click vào ô có công thức</span><span class="en">Double-click a formula cell</span></td>
+          <td><span class="vi">Double-click vào ô hoặc thanh công thức</span><span class="en">Double-click a cell or the formula bar</span></td>
           <td class="desc">
-            <span class="vi">Double-click trực tiếp vào 1 ô đang có công thức sẵn (không qua thanh công thức) &mdash; hoạt động giống F2: tooltip hiện lại để bạn sửa tiếp.</span>
-            <span class="en">Double-clicking directly on a cell that already has a formula (not via the formula bar) &mdash; behaves like F2: the tooltip reappears so you can keep editing.</span>
+            <span class="vi">Double-click vào 1 ô đang có công thức sẵn (không cần qua thanh công thức), hoặc double-click ngay trên thanh công thức (fx) trong lúc sửa &mdash; ở bất kỳ vị trí nào tooltip đang có thể hiện, double-click đều mở lại tooltip đúng để bạn sửa tiếp.</span>
+            <span class="en">Double-clicking a cell that already has a formula (no need to go through the formula bar), or double-clicking directly on the formula bar (fx) while editing &mdash; anywhere the tooltip can normally appear, double-click reliably reopens it so you can keep editing.</span>
           </td>
         </tr>
         <tr>
           <td><span class="vi">Click chuột vào 1 gợi ý</span><span class="en">Click a suggestion</span></td>
           <td class="desc">
-            <span class="vi">Click (hoặc double-click) trực tiếp vào 1 dòng trong danh sách gợi ý AutoComplete &mdash; hàm đó được chọn ngay lập tức, tooltip tham số hiện ra y hệt như khi dùng Tab.</span>
-            <span class="en">Clicking (or double-clicking) directly on a row in the AutoComplete suggestion list &mdash; that function is selected immediately, and the parameter tooltip appears just like with Tab.</span>
+            <span class="vi">Click (hoặc double-click) trực tiếp vào 1 dòng trong danh sách gợi ý AutoComplete &mdash; hàm đó được chọn ngay lập tức, tooltip tham số hiện ra y hệt như khi dùng Tab. Hoạt động ổn định dù đang gõ trên ô hay trên thanh công thức.</span>
+            <span class="en">Clicking (or double-clicking) directly on a row in the AutoComplete suggestion list &mdash; that function is selected immediately, and the parameter tooltip appears just like with Tab. Works reliably whether you're typing in a cell or on the formula bar.</span>
           </td>
         </tr>
         <tr>
@@ -543,12 +568,11 @@
             <li><span class="vi">Mở workbook, nhấn Alt+F11 để mở VBA Editor.</span><span class="en">Open your workbook, press Alt+F11 to open the VBA Editor.</span></li>
             <li><span class="vi">File &gt; Import File... &gt; chọn modVBAFunctions.bas (hoặc module của bạn).</span><span class="en">File &gt; Import File... &gt; select modVBAFunctions.bas (or your own module).</span></li>
             <li><span class="vi">Lưu workbook dạng có Macro (.xlsm hoặc .xlsb).</span><span class="en">Save the workbook as macro-enabled (.xlsm or .xlsb).</span></li>
-            <li><span class="vi">Đóng và mở lại Excel để add-in nạp lại VBAFunctions.xml.</span><span class="en">Close and reopen Excel so the add-in reloads VBAFunctions.xml.</span></li>
           </ol>
           <div class="callout">
-            <b><span class="vi">Lưu ý:</span><span class="en">Note:</span></b>
-            <span class="vi">Add-in chỉ đọc VBAFunctions.xml 1 lần lúc Excel mở. Sửa XML hoặc VBA xong phải đóng và mở lại Excel &mdash; không có nút "Reload".</span>
-            <span class="en">The add-in only reads VBAFunctions.xml once, when Excel opens the add-in. After editing XML or VBA, close and reopen Excel &mdash; there is no "Reload" button.</span>
+            <b><span class="vi">HotReload:</span><span class="en">HotReload:</span></b>
+            <span class="vi">Add-in tự theo dõi thay đổi của VBAFunctions.xml và nạp lại ngay trong vài giây &mdash; không cần đóng và mở lại Excel mỗi khi sửa mô tả hàm, thêm/xóa tham số, hay khai báo hàm mới trong XML.</span>
+            <span class="en">The add-in watches VBAFunctions.xml for changes and reloads within a few seconds &mdash; no need to close and reopen Excel every time you edit a function's description, add/remove parameters, or declare a new function in the XML.</span>
           </div>
         </div>
       </div>
@@ -587,14 +611,16 @@
         <div class="step-num" style="background:var(--ref-purple)">5.2</div>
         <div class="step-body">
           <h4><span class="vi">Khai báo trong VBAFunctions.xml</span><span class="en">Declare it in VBAFunctions.xml</span></h4>
-<pre>&lt;<span class="tg">Function</span> <span class="at">name</span>=<span class="st">"TenHam"</span>&gt;
+<pre>&lt;<span class="tg">Function</span> <span class="at">name</span>=<span class="st">"TenHam"</span> <span class="at">category</span>=<span class="st">"Toan hoc"</span>&gt;
   &lt;<span class="tg">Description</span>&gt;Mo ta ngan gon chuc nang cua ham&lt;/<span class="tg">Description</span>&gt;
   &lt;<span class="tg">Param</span> <span class="at">name</span>=<span class="st">"A"</span>&gt;Mo ta tham so A&lt;/<span class="tg">Param</span>&gt;
-  &lt;<span class="tg">Param</span> <span class="at">name</span>=<span class="st">"B"</span>&gt;Mo ta tham so B&lt;/<span class="tg">Param</span>&gt;
+  &lt;<span class="tg">Param</span> <span class="at">name</span>=<span class="st">"[B]"</span> <span class="at">default</span>=<span class="st">"0"</span>&gt;Mo ta tham so B (tuy chon)&lt;/<span class="tg">Param</span>&gt;
 &lt;/<span class="tg">Function</span>&gt;</pre>
           <ul>
             <li><span class="vi"><code>name</code> của Function và Param không được để trống.</span><span class="en"><code>name</code> on Function and Param cannot be empty.</span></li>
             <li><span class="vi">Tham số tùy chọn: bao tên trong dấu ngoặc vuông, ví dụ <code>name="[Dieu_Kien]"</code>.</span><span class="en">Optional parameter: wrap the name in brackets, e.g. <code>name="[Condition]"</code>.</span></li>
+            <li><span class="vi">Thuộc tính <code>category</code> (tùy chọn) quy định nhóm hiển thị trong Insert Function &mdash; bỏ trống thì Excel tự xếp vào nhóm "User Defined".</span><span class="en">The optional <code>category</code> attribute sets the group shown in Insert Function &mdash; leave it out and Excel files it under "User Defined".</span></li>
+            <li><span class="vi">Thuộc tính <code>default</code> trên Param tùy chọn (tùy chọn) ghi giá trị mặc định &mdash; hiện kèm ngay trong tooltip.</span><span class="en">The optional <code>default</code> attribute on an optional Param records its default value &mdash; shown right in the tooltip.</span></li>
             <li><span class="vi">Thứ tự Function/Param trong XML là thứ tự hiển thị trong tooltip.</span><span class="en">The order of Function/Param in the XML is the display order in the tooltip.</span></li>
             <li><span class="vi">1 Function hoặc Param khai báo sai chỉ bị bỏ qua đúng phần đó, không làm mất tooltip của các hàm còn lại.</span><span class="en">A malformed Function or Param is simply skipped &mdash; it won't break the tooltips for other functions.</span></li>
             <li><span class="vi"><code>name</code> chính là tên bạn sẽ gõ trong Excel, và phải khớp đúng tên hàm VBA thật.</span><span class="en"><code>name</code> is exactly what you type in Excel, and must match the real VBA function name.</span></li>
@@ -605,9 +631,9 @@
       <div class="step">
         <div class="step-num" style="background:var(--ref-green)">5.3</div>
         <div class="step-body">
-          <h4><span class="vi">Đóng và mở lại Excel</span><span class="en">Close and reopen Excel</span></h4>
-          <p><span class="vi">Sửa xong cả VBA và XML, đóng hoàn toàn Excel rồi mở lại để add-in nạp lại danh sách hàm.</span>
-             <span class="en">After editing both VBA and XML, fully close Excel and reopen it so the add-in reloads the function list.</span></p>
+          <h4><span class="vi">Lưu XML &mdash; add-in tự nạp lại</span><span class="en">Save the XML &mdash; the add-in reloads itself</span></h4>
+          <p><span class="vi">Nhờ HotReload, chỉ cần lưu file VBAFunctions.xml là tooltip cập nhật ngay trong Excel đang mở, không cần đóng và mở lại. Riêng module VBA (bước 5.1) vẫn phải Import vào workbook đang dùng nếu đó là module hoàn toàn mới.</span>
+             <span class="en">Thanks to HotReload, simply saving VBAFunctions.xml updates the tooltip in the already-open Excel session &mdash; no restart needed. The VBA module itself (step 5.1) still needs to be imported into the workbook you're using if it's a brand-new module.</span></p>
         </div>
       </div>
     </div>
@@ -622,7 +648,7 @@
     </div>
     <div class="limits">
       <div class="limit-card">
-        <div class="num" style="color:var(--ref-blue)">20</div>
+        <div class="num" style="color:var(--ref-blue)">50</div>
         <p><span class="vi">hàm tối đa được đăng ký làm hàm Excel thật trong 1 lần chạy Excel. Hơn số này vẫn có tooltip, chỉ không gọi được như hàm thật.</span>
            <span class="en">max functions registered as real Excel functions per Excel session. Beyond that, tooltip still works, just not callable as a real function.</span></p>
       </div>
