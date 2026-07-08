@@ -1,28 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Thuoc tinh "category" (tuy chon, them 2026-07-07): quy dinh nhom hien
+  thi cua ham trong hop thoai Insert Function cua Excel (fx). Bo trong
+  hoac khong khai bao thi Excel tu xep vao nhom mac dinh "User Defined"
+  nhu hanh vi truoc day - khong bat buoc sua lai cac Function cu.
+
+  Thuoc tinh "default" cua <Param> (tuy chon, them 2026-07-07): CHI co
+  tac dung voi Param TUY CHON (ten boc trong [ ]) - ghi gia tri mac dinh
+  se hien kem trong tooltip, dang "Ten [optional, mac dinh = X]". Param
+  tuy chon khong khai bao "default" thi tooltip hien nhu cu, chi "[Ten]".
+-->
 <Functions>
-  <Function name="Cong">
+  <Function name="Cong" category="Toan hoc co ban">
     <Description>Tinh tong cua A va B (A + B)</Description>
     <Param name="A">So thu nhat</Param>
     <Param name="B">So thu hai</Param>
   </Function>
-  <Function name="Tru">
+  <Function name="Tru" category="Toan hoc co ban">
     <Description>Tinh hieu cua A va B (A - B)</Description>
     <Param name="A">So bi tru</Param>
     <Param name="B">So tru</Param>
   </Function>
-  <Function name="Nhan">
+  <Function name="Nhan" category="Toan hoc co ban">
     <Description>Tinh tich cua A va B (A * B)</Description>
     <Param name="A">So thu nhat</Param>
     <Param name="B">So thu hai</Param>
   </Function>
-  <Function name="Chia">
+  <Function name="Chia" category="Toan hoc co ban">
     <Description>Tinh thuong cua A chia B (A / B), tra ve #DIV/0! neu B = 0</Description>
     <Param name="A">So bi chia</Param>
     <Param name="B">So chia</Param>
   </Function>
-  <Function name="TinhTongCoDieuKien">
+  <Function name="TinhTongCoDieuKien" category="Thong ke">
     <Description>Tinh tong cac gia tri trong vung, co the loc theo dieu kien don gian</Description>
     <Param name="Rng">Vung du lieu (Range) can tinh tong</Param>
-    <Param name="[Condition]">Dieu kien loc dang &gt;100, &lt;50, &gt;=10, &lt;=20, =5, &lt;&gt;0 (bo trong = tinh tong tat ca)</Param>
+    <Param name="[Condition]" default="rong">Dieu kien loc dang &gt;100, &lt;50, &gt;=10, &lt;=20, =5, &lt;&gt;0 (bo trong = tinh tong tat ca)</Param>
   </Function>
 </Functions>
