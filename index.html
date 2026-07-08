@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Excel Intellisense XLL &mdash; Tooltip IntelliSense cho hàm VBA</title>
-<meta name="description" content="Add-in Excel (.xll 64-bit) thêm tooltip gợi ý tham số cho hàm VBA tự viết, tùy chọn cầu nối gọi như hàm Excel thật.">
+<meta name="description" content="Add-in Excel (.xll, 32-bit và 64-bit) thêm tooltip gợi ý tham số cho hàm VBA tự viết, tùy chọn cầu nối gọi như hàm Excel thật.">
 
 <!-- Open Graph: can tao file anh that og-image.png (1200x630) dat cung thu muc voi index.html, va xac nhan lai og:url dung voi domain GitHub Pages thuc te truoc khi publish -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Excel Intellisense XLL">
 <meta property="og:url" content="https://kieumanh366377.github.io/excel-intellisense-xll/">
 <meta property="og:title" content="Excel Intellisense XLL &mdash; Tooltip IntelliSense cho hàm VBA">
-<meta property="og:description" content="Add-in Excel (.xll 64-bit) thêm tooltip gợi ý tham số cho hàm VBA tự viết, tùy chọn cầu nối gọi như hàm Excel thật.">
+<meta property="og:description" content="Add-in Excel (.xll, 32-bit và 64-bit) thêm tooltip gợi ý tham số cho hàm VBA tự viết, tùy chọn cầu nối gọi như hàm Excel thật.">
 <meta property="og:image" content="https://kieumanh366377.github.io/excel-intellisense-xll/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -20,7 +20,7 @@
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Excel Intellisense XLL &mdash; Tooltip IntelliSense cho hàm VBA">
-<meta name="twitter:description" content="Add-in Excel (.xll 64-bit) thêm tooltip gợi ý tham số cho hàm VBA tự viết, tùy chọn cầu nối gọi như hàm Excel thật.">
+<meta name="twitter:description" content="Add-in Excel (.xll, 32-bit và 64-bit) thêm tooltip gợi ý tham số cho hàm VBA tự viết, tùy chọn cầu nối gọi như hàm Excel thật.">
 <meta name="twitter:image" content="https://kieumanh366377.github.io/excel-intellisense-xll/og-image.png">
 
 <link rel="icon" href="data:,">
@@ -312,16 +312,16 @@
   <div class="wrap hero-grid">
     <div>
       <div class="eyebrow"><span class="dot"></span>
-        <span class="vi">Delphi &middot; XLL 64-bit &middot; Excel</span>
-        <span class="en">Delphi &middot; XLL 64-bit &middot; Excel</span>
+        <span class="vi">Delphi &middot; XLL 32/64-bit &middot; Excel</span>
+        <span class="en">Delphi &middot; XLL 32/64-bit &middot; Excel</span>
       </div>
       <h1>
         <span class="vi">Tooltip IntelliSense cho hàm <span class="accent">VBA</span> của bạn</span>
         <span class="en">IntelliSense tooltips for <span class="accent">your VBA</span> functions</span>
       </h1>
       <p class="lede">
-        <span class="vi">Add-in Excel (.xll, 64-bit) giúp hàm VBA tự viết trong workbook có được tooltip gợi ý tham số giống hệt hàm gốc của Excel &mdash; và tùy chọn gọi được như 1 hàm Excel thật, không cần build lại add-in mỗi khi thêm hàm mới.</span>
-        <span class="en">A 64-bit .xll add-in that gives your own VBA functions the same parameter-hint tooltip as native Excel functions &mdash; and optionally makes them callable as real Excel functions, no rebuild needed when you add a new one.</span>
+        <span class="vi">Add-in Excel (.xll, 32-bit và 64-bit) giúp hàm VBA tự viết trong workbook có được tooltip gợi ý tham số giống hệt hàm gốc của Excel &mdash; và tùy chọn gọi được như 1 hàm Excel thật, không cần build lại add-in mỗi khi thêm hàm mới.</span>
+        <span class="en">A 32-bit and 64-bit .xll add-in that gives your own VBA functions the same parameter-hint tooltip as native Excel functions &mdash; and optionally makes them callable as real Excel functions, no rebuild needed when you add a new one.</span>
       </p>
       <div class="cta-row">
         <a class="btn btn-primary" href="https://github.com/KieuManh366377/excel-intellisense-xll" target="_blank" rel="noopener">
@@ -332,7 +332,7 @@
         </a>
       </div>
       <div class="meta-row">
-        <span><span class="dot" style="background:var(--ref-blue)"></span><span class="vi">Excel 64-bit</span><span class="en">Excel 64-bit</span></span>
+        <span><span class="dot" style="background:var(--ref-blue)"></span><span class="vi">Excel 32/64-bit</span><span class="en">Excel 32/64-bit</span></span>
         <span><span class="dot" style="background:var(--ref-purple)"></span><span class="vi">Không cần build lại .xll</span><span class="en">No .xll rebuild needed</span></span>
         <span><span class="dot" style="background:var(--ref-green)"></span>MIT License</span>
       </div>
@@ -384,6 +384,14 @@
         <tr>
           <td><code>ExcelIntellisense64.XLL</code></td>
           <td class="desc"><span class="vi">Add-in Excel 64-bit đã build sẵn &mdash; không kèm mã nguồn.</span><span class="en">Pre-built 64-bit Excel add-in &mdash; no source included.</span></td>
+        </tr>
+        <tr>
+          <td><code>ExcelIntellisense32.XLL</code></td>
+          <td class="desc"><span class="vi">Add-in Excel 32-bit đã build sẵn (cùng chức năng bản 64-bit) &mdash; không kèm mã nguồn.</span><span class="en">Pre-built 32-bit Excel add-in (same functionality as the 64-bit build) &mdash; no source included.</span></td>
+        </tr>
+        <tr>
+          <td><code>XLLTool.exe</code></td>
+          <td class="desc"><span class="vi">Công cụ console cài đặt / gỡ cài đặt add-in tự động &mdash; tự nhận diện bản 32/64-bit phù hợp, tự đăng ký với Excel. Mã nguồn Go kèm theo trong thư mục <code>Tools/</code>.</span><span class="en">Console tool to install / uninstall the add-in automatically &mdash; detects the right 32/64-bit build and registers it with Excel. Go source included in the <code>Tools/</code> folder.</span></td>
         </tr>
         <tr>
           <td><code>ExcelIntellisense64_Demo.xlsb</code></td>
@@ -516,7 +524,7 @@
       <h2><span class="vi">Yêu cầu hệ thống</span><span class="en">System requirements</span></h2>
     </div>
     <ul style="color:var(--text-dim);font-size:15px;padding-left:20px;margin:0;">
-      <li><span class="vi">Windows, Microsoft Excel bản <b style="color:var(--text)">64-bit</b> (đã test trên Excel 2024 / Windows 11).</span><span class="en">Windows, Microsoft Excel <b style="color:var(--text)">64-bit</b> (tested on Excel 2024 / Windows 11).</span></li>
+      <li><span class="vi">Windows, Microsoft Excel bản <b style="color:var(--text)">32-bit hoặc 64-bit</b> (đã test trên Excel 2024 64-bit / Windows 11, và Excel 2016 32-bit / Windows 10).</span><span class="en">Windows, Microsoft Excel <b style="color:var(--text)">32-bit or 64-bit</b> (tested on Excel 2024 64-bit / Windows 11, and Excel 2016 32-bit / Windows 10).</span></li>
       <li><span class="vi">Excel phải cho phép chạy Macro (VBA) và load Add-in .xll.</span><span class="en">Excel must allow running Macros (VBA) and loading .xll add-ins.</span></li>
     </ul>
   </div>
@@ -533,21 +541,32 @@
       <div class="step">
         <div class="step-num" style="background:var(--ref-blue)">1</div>
         <div class="step-body">
-          <h4><span class="vi">Chuẩn bị thư mục</span><span class="en">Prepare a folder</span></h4>
-          <p><span class="vi">Đặt <code>ExcelIntellisense64.XLL</code> và <code>VBAFunctions.xml</code> vào <b style="color:var(--text)">cùng 1 thư mục</b> (bất kỳ đâu, không bắt buộc cấu trúc cố định).</span>
-             <span class="en">Put <code>ExcelIntellisense64.XLL</code> and <code>VBAFunctions.xml</code> in the <b style="color:var(--text)">same folder</b> (anywhere &mdash; no fixed structure required).</span></p>
+          <h4><span class="vi">Cài đặt bằng XLLTool.exe (khuyến nghị)</span><span class="en">Install with XLLTool.exe (recommended)</span></h4>
+          <p><span class="vi">Đặt <code>XLLTool.exe</code> cùng thư mục với <code>ExcelIntellisense64.XLL</code> (và/hoặc <code>ExcelIntellisense32.XLL</code>) và <code>VBAFunctions.xml</code>. Đóng Excel nếu đang mở, chạy <code>XLLTool.exe</code>, chọn <code>[1] Cai dat add-in</code>.</span>
+             <span class="en">Put <code>XLLTool.exe</code> in the same folder as <code>ExcelIntellisense64.XLL</code> (and/or <code>ExcelIntellisense32.XLL</code>) and <code>VBAFunctions.xml</code>. Close Excel if it's open, run <code>XLLTool.exe</code>, choose <code>[1] Cai dat add-in</code>.</span></p>
+          <ul>
+            <li><span class="vi">Nếu có cả 2 bản 32-bit và 64-bit, XLLTool.exe tự đọc file <code>EXCEL.EXE</code> thật trên máy để phát hiện đúng bản và gợi ý sẵn &mdash; Enter để dùng gợi ý, hoặc tự gõ <code>32</code>/<code>64</code>.</span><span class="en">If both the 32-bit and 64-bit builds are present, XLLTool.exe reads the real <code>EXCEL.EXE</code> file on the machine to detect the right one and suggests it &mdash; press Enter to accept, or type <code>32</code>/<code>64</code> to choose.</span></li>
+            <li><span class="vi">Enter để dùng thư mục cài đặt mặc định (<code>%LOCALAPPDATA%\ExcelIntellisenseXLL</code>), hoặc nhập đường dẫn khác.</span><span class="en">Press Enter for the default install folder (<code>%LOCALAPPDATA%\ExcelIntellisenseXLL</code>), or type a different path.</span></li>
+            <li><span class="vi">Xong &mdash; add-in tự đăng ký với Excel, mở Excel lên là tự nạp, không cần vào <code>File &gt; Options &gt; Add-ins</code> thủ công.</span><span class="en">Done &mdash; the add-in registers itself with Excel, so it loads automatically the next time Excel opens, no need to go through <code>File &gt; Options &gt; Add-ins</code> manually.</span></li>
+          </ul>
+          <p style="margin-top:10px"><span class="vi">Gỡ cài đặt: chạy lại <code>XLLTool.exe</code>, chọn <code>[2] Go cai dat add-in</code>.</span><span class="en">To uninstall: run <code>XLLTool.exe</code> again and choose <code>[2] Go cai dat add-in</code>.</span></p>
         </div>
       </div>
 
       <div class="step">
         <div class="step-num" style="background:var(--ref-purple)">2</div>
         <div class="step-body">
-          <h4><span class="vi">Nạp add-in vào Excel</span><span class="en">Load the add-in into Excel</span></h4>
+          <h4><span class="vi">Cách thủ công (khi không dùng được XLLTool.exe)</span><span class="en">Manual install (if XLLTool.exe isn't an option)</span></h4>
+          <p><b style="color:var(--text)"><span class="vi">Bước 1 &mdash; Chuẩn bị thư mục:</span><span class="en">Step 1 &mdash; Prepare a folder:</span></b>
+          <span class="vi">Đặt file .xll đúng bản (32-bit hoặc 64-bit, khớp với Excel đang cài) và <code>VBAFunctions.xml</code> vào <b style="color:var(--text)">cùng 1 thư mục</b> (bất kỳ đâu, không bắt buộc cấu trúc cố định).</span>
+          <span class="en">Put the matching .xll build (32-bit or 64-bit, matching your Excel) and <code>VBAFunctions.xml</code> in the <b style="color:var(--text)">same folder</b> (anywhere &mdash; no fixed structure required).</span></p>
+
+          <p style="margin-top:12px"><b style="color:var(--text)"><span class="vi">Bước 2 &mdash; Nạp add-in vào Excel:</span><span class="en">Step 2 &mdash; Load the add-in into Excel:</span></b></p>
           <p><b style="color:var(--text)"><span class="vi">Cách 1 &mdash; Nạp cố định (khuyến nghị):</span><span class="en">Option 1 &mdash; Permanent (recommended):</span></b></p>
           <ol>
             <li><span class="vi">Mở Excel &gt; File &gt; Options &gt; Add-ins.</span><span class="en">Open Excel &gt; File &gt; Options &gt; Add-ins.</span></li>
             <li><span class="vi">Ở Manage, chọn Excel Add-ins &gt; bấm Go...</span><span class="en">In Manage, choose Excel Add-ins &gt; click Go...</span></li>
-            <li><span class="vi">Bấm Browse..., chọn file ExcelIntellisense64.XLL.</span><span class="en">Click Browse..., select ExcelIntellisense64.XLL.</span></li>
+            <li><span class="vi">Bấm Browse..., chọn đúng file .xll (32-bit hoặc 64-bit).</span><span class="en">Click Browse..., select the matching .xll (32-bit or 64-bit).</span></li>
             <li><span class="vi">Bấm OK, đảm bảo add-in đã được tick chọn.</span><span class="en">Click OK, make sure the add-in is checked.</span></li>
           </ol>
           <p style="margin-top:12px"><b style="color:var(--text)"><span class="vi">Cách 2 &mdash; Nạp tạm (chỉ cho session hiện tại):</span><span class="en">Option 2 &mdash; Temporary (this session only):</span></b><br>

@@ -1,6 +1,6 @@
 # Excel Intellisense XLL - IntelliSense Tooltip & VBA Function Bridge
 
-Add-in Excel (.xll, 64-bit) viết bằng Delphi, giúp các hàm VBA tự viết trong workbook có được **tooltip gợi ý tham số** giống hàm gốc của Excel (SUM, VLOOKUP...), và tùy chọn cho phép gọi hàm VBA **như một hàm Excel thật** (xuất hiện trong AutoComplete/Insert Function, có tooltip đầy đủ) mà không cần build lại add-in mỗi khi thêm hàm mới.
+Add-in Excel (.xll, hỗ trợ cả **32-bit và 64-bit**) viết bằng Delphi, giúp các hàm VBA tự viết trong workbook có được **tooltip gợi ý tham số** giống hàm gốc của Excel (SUM, VLOOKUP...), và tùy chọn cho phép gọi hàm VBA **như một hàm Excel thật** (xuất hiện trong AutoComplete/Insert Function, có tooltip đầy đủ) mà không cần build lại add-in mỗi khi thêm hàm mới.
 
 > Lưu ý: đây là bản phát hành dạng **binary (.xll đã build sẵn)**. Repo này **không chia sẻ mã nguồn Delphi** của add-in - chỉ chia sẻ file .xll đã build, file demo, và phần cấu hình XML/VBA mà người dùng có thể tự chỉnh sửa để mở rộng hàm của riêng mình.
 
@@ -11,9 +11,11 @@ Add-in Excel (.xll, 64-bit) viết bằng Delphi, giúp các hàm VBA tự viế
 | File | Mô tả |
 |---|---|
 | `ExcelIntellisense64.XLL` | Add-in Excel 64-bit đã build sẵn - **không kèm mã nguồn**. |
+| `ExcelIntellisense32.XLL` | Add-in Excel 32-bit đã build sẵn (cùng chức năng bản 64-bit, dùng cho Excel 32-bit) - **không kèm mã nguồn**. |
 | `ExcelIntellisense64_Demo.xlsb` | Workbook demo, đã import sẵn `modVBAFunctions.bas`, dùng để test nhanh không cần tự setup. |
 | `VBAFunctions.xml` | File khai báo danh sách hàm VBA cần có tooltip / đăng ký làm hàm Excel thật. Người dùng tự sửa file này để thêm hàm mới, **không cần build lại .xll**. |
 | `modVBAFunctions.bas` | Module VBA mẫu (4 hàm Cong, Tru, Nhan, Chia + 1 hàm test tham số Range là TinhTongCoDieuKien) minh họa cách viết hàm tương thích với add-in. |
+| `XLLTool.exe` | Công cụ dòng lệnh (console, hỏi đáp từng bước) để **cài đặt / gỡ cài đặt** add-in tự động - tự nhận diện bản 32-bit/64-bit phù hợp, tự đăng ký add-in với Excel, không cần vào `File > Options > Add-ins` thủ công. Mã nguồn Go đi kèm trong thư mục `Tools/` (`main.go`, `go.mod`, `build.bat`) nếu muốn tự build lại. |
 
 ---
 
@@ -51,33 +53,51 @@ Giới hạn của cơ chế cầu nối này:
 
 ## 3. Yêu cầu hệ thống
 
-- Windows, Microsoft Excel bản 64-bit (đã test trên Excel 2024 / Windows 11).
+- Windows, Microsoft Excel bản **32-bit hoặc 64-bit** (đã test trên Excel 2024 64-bit / Windows 11, và Excel 2016 32-bit / Windows 10).
 - Excel phải cho phép chạy Macro (VBA) và load Add-in .xll.
 
 ---
 
 ## 4. Cài đặt
 
-### Bước 1 - Chuẩn bị thư mục
+### Cách 1 - Dùng XLLTool.exe (khuyến nghị)
+
+1. Tải và đặt các file sau vào **cùng 1 thư mục**:
+   ```
+   XLLTool.exe
+   ExcelIntellisense64.XLL   (và/hoặc ExcelIntellisense32.XLL)
+   VBAFunctions.xml
+   ```
+2. Đóng Excel nếu đang mở (file `.xll` có thể bị khóa nếu Excel đang chạy).
+3. Chạy `XLLTool.exe`, chọn `[1] Cai dat add-in`.
+4. Nếu thư mục có **cả 2 bản** 32-bit và 64-bit, `XLLTool.exe` tự phát hiện Excel trên máy là bản nào (đọc trực tiếp file `EXCEL.EXE` thật) và gợi ý sẵn - nhấn Enter để dùng gợi ý, hoặc tự gõ `32`/`64` nếu muốn cài bản khác.
+5. Nhấn Enter để dùng thư mục cài đặt mặc định (`%LOCALAPPDATA%\ExcelIntellisenseXLL`), hoặc nhập đường dẫn khác.
+6. Thấy dòng `"Cai dat thanh cong!"` là xong - mở Excel lên, add-in **tự nạp ngay**, không cần vào `File > Options > Add-ins` thủ công.
+
+Gỡ cài đặt: đóng Excel, chạy lại `XLLTool.exe`, chọn `[2] Go cai dat add-in`, làm theo hướng dẫn trên màn hình (có tùy chọn xóa luôn thư mục đã cài).
+
+### Cách 2 - Cài thủ công (khi không dùng được XLLTool.exe)
+
+**Bước 1 - Chuẩn bị thư mục**
 Đặt 2 file sau vào **cùng 1 thư mục**:
 ```
-ExcelIntellisense64.XLL
+ExcelIntellisense64.XLL   (hoặc ExcelIntellisense32.XLL tùy bản Excel)
 VBAFunctions.xml
 ```
 (có thể đặt bất kỳ đâu, không bắt buộc theo cấu trúc cố định, chỉ cần 2 file này nằm cùng thư mục với nhau)
 
-### Bước 2 - Nạp add-in vào Excel
+**Bước 2 - Nạp add-in vào Excel**
 Cách 1 - Nạp cố định (khuyến nghị, tự load mỗi lần mở Excel):
 1. Mở Excel > `File` > `Options` > `Add-ins`.
 2. Ở ô `Manage`, chọn `Excel Add-ins` > bấm `Go...`.
-3. Bấm `Browse...`, chọn file `ExcelIntellisense64.XLL`.
+3. Bấm `Browse...`, chọn file `.xll` đúng bản (32-bit hoặc 64-bit) khớp với Excel đang cài.
 4. Bấm `OK`, đảm bảo add-in đã được tick chọn trong danh sách.
 
 Cách 2 - Nạp tạm (chỉ dùng cho session hiện tại):
-- Double-click trực tiếp vào file `ExcelIntellisense64.XLL` khi Excel đang mở, hoặc kéo-thả file .xll vào Excel.
+- Double-click trực tiếp vào file `.xll` khi Excel đang mở, hoặc kéo-thả file .xll vào Excel.
 
 ### Bước 3 - Thêm hàm VBA của bạn
-Có 2 cách để test:
+Áp dụng chung cho cả 2 cách cài đặt ở trên. Có 2 cách để test:
 
 **Cách A - Dùng file demo có sẵn:**
 Mở `ExcelIntellisense64_Demo.xlsb` (đã import sẵn `modVBAFunctions.bas`), đảm bảo add-in đã nạp (Bước 2), gõ thử `=Cong(` trong 1 ô.
