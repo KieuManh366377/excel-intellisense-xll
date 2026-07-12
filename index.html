@@ -427,8 +427,9 @@
           <li><span class="vi">Mô tả của tham số đang gõ.</span><span class="en">Description of the current parameter.</span></li>
           <li><span class="vi">Mô tả tổng quát của hàm.</span><span class="en">General description of the function.</span></li>
           <li><span class="vi">Tham số tùy chọn có khai báo giá trị mặc định sẽ hiện kèm giá trị đó ngay trong tên tham số, ví dụ <code>Dieu_Kien [optional, mac dinh = rong]</code>.</span><span class="en">An optional parameter with a declared default value shows that default right in the parameter name, e.g. <code>Condition [optional, default = empty]</code>.</span></li>
+          <li><span class="vi">Hàm nhiều tham số (7-8 tham số trở lên) tự động xuống dòng và luôn được kẹp gọn trong màn hình đang chứa thanh công thức &mdash; không bao giờ bị tràn ra ngoài mép phải/dưới dù danh sách tham số rất dài.</span><span class="en">Functions with many parameters (7-8 or more) wrap onto multiple lines automatically and are always clamped within the screen holding the formula bar &mdash; never overflowing the right/bottom edge even with a very long parameter list.</span></li>
         </ul>
-        <p style="margin-top:14px"><span class="vi">Toàn bộ nội dung lấy từ <code>VBAFunctions.xml</code>. Tooltip cũng tự hiện lại khi mở file cũ, double-click vào ô có công thức, hoặc nhấn F2.</span><span class="en">All content comes from <code>VBAFunctions.xml</code>. It also reappears when reopening a saved formula, double-clicking a formula cell, or pressing F2.</span></p>
+        <p style="margin-top:14px"><span class="vi">Toàn bộ nội dung lấy từ <code>VBAFunctions.xml</code>. Tooltip cũng tự hiện lại khi mở file cũ, chỉ cần click 1 lần chọn ô có công thức (không cần double-click), double-click vào ô hoặc thanh công thức, hoặc nhấn F2.</span><span class="en">All content comes from <code>VBAFunctions.xml</code>. It also reappears when reopening a saved formula, with a single click on a formula cell (no double-click needed), by double-clicking the cell or the formula bar, or by pressing F2.</span></p>
       </div>
 
       <div class="card alt">
@@ -485,6 +486,13 @@
           </td>
         </tr>
         <tr>
+          <td><span class="vi">Click 1 lần chọn ô có sẵn công thức</span><span class="en">Single-click a cell with an existing formula</span></td>
+          <td class="desc">
+            <span class="vi">Chỉ cần <b style="color:var(--text)">chọn ô</b> (không cần double-click hay F2) &mdash; nếu ô đó đang trống thao tác gõ dở, add-in đọc công thức đã lưu và hiện tooltip xem trước ngay lập tức, tiện để nhìn nhanh 1 công thức mà không cần vào chế độ sửa.</span>
+            <span class="en">Just <b style="color:var(--text)">selecting the cell</b> (no double-click or F2 needed) &mdash; if nothing is currently being typed, the add-in reads the saved formula and shows a preview tooltip right away, handy for a quick look without entering edit mode.</span>
+          </td>
+        </tr>
+        <tr>
           <td><span class="vi">Double-click vào ô hoặc thanh công thức</span><span class="en">Double-click a cell or the formula bar</span></td>
           <td class="desc">
             <span class="vi">Double-click vào 1 ô đang có công thức sẵn (không cần qua thanh công thức), hoặc double-click ngay trên thanh công thức (fx) trong lúc sửa &mdash; ở bất kỳ vị trí nào tooltip đang có thể hiện, double-click đều mở lại tooltip đúng để bạn sửa tiếp.</span>
@@ -503,6 +511,13 @@
           <td class="desc">
             <span class="vi">Chỉ <b style="color:var(--text)">di chuyển vùng tô sáng</b> để xem trước các gợi ý, <b style="color:var(--text)">chưa thực sự chọn</b> &mdash; cần Tab, Enter, hoặc click chuột thì tooltip mới hiện đúng hàm đang tô sáng.</span>
             <span class="en">Only <b style="color:var(--text)">moves the highlight</b> to preview suggestions &mdash; it does <b style="color:var(--text)">not commit</b> a selection yet. Press Tab, Enter, or click to actually select and show the tooltip for the highlighted function.</span>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="vi">Gõ tắt trùng nhiều hàm + Tab</span><span class="en">Short prefix matching several functions + Tab</span></td>
+          <td class="desc">
+            <span class="vi">Khi tiền tố gõ khớp <b style="color:var(--text)">từ 2 hàm tùy biến trở lên</b> (ví dụ <code>=Tinh</code>), add-in tự đếm đúng số lần bấm mũi tên lên/xuống để biết bạn đang chọn hàm nào &mdash; dù giao diện gợi ý hiện đại của Excel không cho phép đọc trực tiếp, Tab vẫn hoàn tất đúng hàm đó và hiện tooltip tương ứng. Gõ đủ tên, hoặc gõ tới khi tiền tố chỉ còn khớp duy nhất 1 hàm, luôn cho kết quả chính xác tuyệt đối mà không cần dùng tới mũi tên.</span>
+            <span class="en">When the typed prefix matches <b style="color:var(--text)">two or more custom functions</b> (e.g. <code>=Tinh</code>), the add-in tracks exactly how many times you pressed Up/Down to know which one you meant &mdash; even though Excel's modern suggestion UI can't be read directly, Tab still completes the right function and shows its tooltip. Typing the full name, or enough of it that only one function still matches, always gives an exact result without needing the arrow keys.</span>
           </td>
         </tr>
         <tr>
@@ -680,6 +695,11 @@
         <div class="num" style="color:var(--ref-pink)">*</div>
         <p><span class="vi">Trong vài trường hợp sửa công thức phức tạp (mũi tên, Delete giữa chuỗi...), tooltip có thể tự ẩn thay vì hiện sai &mdash; đây là hành vi có chủ đích.</span>
            <span class="en">In some complex edit cases (arrow keys, Delete mid-string...) the tooltip hides itself instead of showing something wrong &mdash; this is intentional.</span></p>
+      </div>
+      <div class="limit-card">
+        <div class="num" style="color:var(--ref-orange)">**</div>
+        <p><span class="vi">Gõ tắt trùng nhiều hàm rồi bấm Tab <b style="color:var(--text)">ngay không dùng mũi tên</b> đôi khi đoán sai tên hàm (Excel tự ưu tiên hàm dùng gần đây, không theo A-Z) &mdash; sai thì thấy ngay qua tên hàm trong tooltip, công thức vẫn luôn được Excel hoàn tất đúng. Gõ đủ tên hoặc dùng mũi tên xác nhận trước khi Tab sẽ luôn chính xác.</span>
+           <span class="en">Typing a short prefix matching several functions and pressing Tab <b style="color:var(--text)">right away without arrow keys</b> can occasionally guess the wrong function name (Excel seems to favor recently-used ones over A-Z order) &mdash; a wrong guess is immediately visible in the tooltip's function name, and the formula itself is always completed correctly by Excel regardless. Typing the full name, or confirming with arrow keys before Tab, is always exact.</span></p>
       </div>
     </div>
   </div>
