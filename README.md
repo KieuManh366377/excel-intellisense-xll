@@ -31,6 +31,9 @@ Khi gõ `=TenHam(` trong 1 ô, add-in hiện 1 tooltip ngay dưới thanh công 
 - Nếu tham số tùy chọn có khai báo giá trị mặc định trong XML, tên tham số sẽ hiện kèm giá trị đó ngay trong tooltip, ví dụ `Dieu_Kien [optional, mac dinh = rong]`.
 - Hàm nhiều tham số (7-8 tham số trở lên) tự động **xuống dòng** và luôn được **kẹp gọn trong màn hình** đang chứa thanh công thức - không bao giờ tràn ra ngoài mép phải/dưới dù danh sách tham số rất dài.
 
+![Tooltip IntelliSense hiện tham số ngay dưới thanh công thức](Tooltip.png)
+<p align="center"><i>Tooltip tự hiện khi gõ hàm - tham số đang gõ được in đậm/gạch dưới, kèm mô tả riêng và mô tả tổng quát của hàm.</i></p>
+
 Toàn bộ nội dung tooltip lấy từ file `VBAFunctions.xml` - không cần viết thêm gì trong VBA để có tooltip.
 
 Tooltip cũng tự hiện lại đúng nội dung khi:
